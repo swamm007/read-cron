@@ -1,0 +1,1 @@
+The [.github/workflows/publish.yml](https://github.com/bradymholt/cRonstrue/actions?query=workflow%3A%22Publish+to+npm+Registry%22) GitHub Actions Workflow handling publishing new versions of cRonstrue when a pull request is merged.  It can also be run manually at any time.
