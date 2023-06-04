@@ -1,6 +1,6 @@
 {
-  "name": "read-cron",
-  "title": "read-cron",
+  "name": "readcron",
+  "title": "readcron",
   "version": "1.0.0",
   "description": "Convert cron expressions into human readable descriptions",
   "author": "widewu",

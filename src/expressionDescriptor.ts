@@ -108,9 +108,13 @@ export class ExpressionDescriptor {
       var monthDesc = this.getMonthDescription();
       var dayOfWeekDesc = this.getDayOfWeekDescription();
       var yearDesc = this.getYearDescription();
-
-      // description += timeSegment + dayOfMonthDesc + dayOfWeekDesc + monthDesc + yearDesc;
-      description += yearDesc + monthDesc + dayOfWeekDesc + dayOfMonthDesc + timeSegment;
+      if (this.options.locale === 'zh_CN') {
+        description += yearDesc + monthDesc + dayOfWeekDesc + dayOfMonthDesc + timeSegment;
+      } else {
+        description += timeSegment + dayOfMonthDesc + dayOfWeekDesc + monthDesc + yearDesc;
+      }
+      
+     
       description = this.transformVerbosity(description, !!this.options.verbose);
 
       // uppercase first character
@@ -124,7 +128,7 @@ export class ExpressionDescriptor {
     }
     return description;
   }
-
+  // 获取小时、分钟、秒的描述
   protected getTimeOfDayDescription() {
     debugger
     let secondsExpression: string = this.expressionParts[0];
@@ -295,7 +299,7 @@ export class ExpressionDescriptor {
 
     return description;
   }
-
+  // 获取周几
   protected getDayOfWeekDescription() {
     debugger
     var daysOfWeekNames = this.i18n.daysOfTheWeek();
@@ -306,7 +310,9 @@ export class ExpressionDescriptor {
       // Otherwise, we could get a contradiction like "on day 1 of the month, every day"
       // or a dupe description like "every day, every day".
       description = "";
-    } else {
+    } else if (this.expressionParts[3] != "*" || this.expressionParts[4]!= "*") {
+      description = "";
+    }else {
       description = this.getSegmentDescription(
         this.expressionParts[5],
         this.i18n.commaEveryDay(),
@@ -385,10 +391,12 @@ export class ExpressionDescriptor {
   }
 
   protected getMonthDescription() {
+    debugger
     var monthNames = this.i18n.monthsOfTheYear();
 
     let description: string | null = this.getSegmentDescription(
       this.expressionParts[4],
+      // this.i18n.commaOnThe(),
       "",
       (s, form) => {
         return form && this.i18n.monthsOfTheYearInCase
@@ -449,7 +457,9 @@ export class ExpressionDescriptor {
           } else if (expression == "*" && this.expressionParts[5] != "*") {
             // * dayOfMonth and dayOfWeek specified so use dayOfWeek verbiage instead
             return "";
-          } else {
+          } else if (expression != "*" && this.expressionParts[5] != "*") {
+            return StringUtilities.format(this.i18n.dayX0(), expression)
+          }else {
             description = this.getSegmentDescription(
               expression,
               this.i18n.commaEveryDay(),
@@ -467,7 +477,12 @@ export class ExpressionDescriptor {
                 return this.i18n.commaBetweenDayX0AndX1OfTheMonth(s);
               },
               (s) => {
-                return this.i18n.commaOnDayX0OfTheMonth(s);
+                if (!StringUtilities.containsAny(this.expression[4], ExpressionDescriptor.specialCharacters)) {
+                  return this.i18n.commaOnDayX0OfTheMonth(s);
+                } else {
+                  return this.i18n.spaceX0OfTheMonth()
+                }
+                
               }
             );
           }
@@ -531,12 +546,12 @@ export class ExpressionDescriptor {
           descriptionContent += ",";
 
           if (i < segments.length - 1) {
-            descriptionContent += " ";
+            descriptionContent += "";
           }
         }
 
         if (i > 0 && segments.length > 1 && (i == segments.length - 1 || segments.length == 2)) {
-          descriptionContent += `${this.i18n.spaceAnd()} `;
+          descriptionContent += `${this.i18n.spaceAnd()}`;
         }
 
         if (segments[i].indexOf("/") > -1 || segments[i].indexOf("-") > -1) {
@@ -554,7 +569,7 @@ export class ExpressionDescriptor {
           );
 
           if (isSegmentRangeWithoutIncrement) {
-            currentDescriptionContent = currentDescriptionContent!.replace(", ", "");
+            currentDescriptionContent = currentDescriptionContent!.replace(",", "");
           }
 
           descriptionContent += currentDescriptionContent;
@@ -637,12 +652,13 @@ export class ExpressionDescriptor {
   }
 
   protected formatTime(hourExpression: string, minuteExpression: string, secondExpression: string) {
+    debugger
     let hour: number = parseInt(hourExpression);
     let period: string = "";
     let setPeriodBeforeTime: boolean = false;
     if (!this.options.use24HourTimeFormat) {
       setPeriodBeforeTime = !!(this.i18n.setPeriodBeforeTime && this.i18n.setPeriodBeforeTime());
-      period = setPeriodBeforeTime ? `${this.getPeriod(hour)} ` : ` ${this.getPeriod(hour)}`;
+      period = setPeriodBeforeTime ? `${this.getPeriod(hour)}` : `${this.getPeriod(hour)}`;
       if (hour > 12) {
         hour -= 12;
       }
@@ -674,12 +690,15 @@ export class ExpressionDescriptor {
   }
 
   private getPeriod(hour: number): string {
-    if (hour < 6) {
-      return '凌晨'
-    } 
-    if (hour >= 6 && hour < 12) return this.i18n.am()
-    if (hour >=12  && hour <= 18) return this.i18n.pm()
-    if (hour >18) return '晚上'
-    // return hour >= 12 ? (this.i18n.pm && this.i18n.pm()) || "PM" : (this.i18n.am && this.i18n.am()) || "AM";
+    if(this.options.locale === 'zh_CN') {
+      if (hour < 6) {
+        return '凌晨'
+      } 
+      if (hour >= 6 && hour < 12) return this.i18n.am()
+      if (hour >=12  && hour <= 18) return this.i18n.pm()
+      if (hour >18) return '晚上'
+    } else {
+      return hour >= 12 ? (this.i18n.pm && this.i18n.pm()) || "PM" : (this.i18n.am && this.i18n.am()) || "AM";
+    }
   }
 }

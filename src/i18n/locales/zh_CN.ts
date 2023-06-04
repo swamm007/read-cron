@@ -48,7 +48,7 @@ export class zh_CN implements Locale {
     return "";
   }
   spaceAnd() {
-    return " 和";
+    return "和";
   }
   everySecond() {
     return "每秒";
@@ -87,10 +87,10 @@ export class zh_CN implements Locale {
     return "每周的每 %s 天";
   }
   commaX0ThroughX1() {
-    return "%s至%s,";
+    return "%s至%s";
   }
   commaAndX0ThroughX1() {
-    return "和%s至%s,";
+    return "和%s至%s";
   }
   first() {
     return "第一个";
@@ -132,7 +132,7 @@ export class zh_CN implements Locale {
     return "仅限%s";
   }
   commaOnlyInMonthX0() {
-    return "仅于%s份";
+    return "每年%s";
   }
   commaOnlyInYearX0() {
     return "仅于 %s 年";
@@ -171,7 +171,7 @@ export class zh_CN implements Locale {
     return "%s开始";
   }
   dayX0() {
-    return "%s 号";
+    return "%s号";
   }
   daysOfTheWeek() {
     return ["周日", "周一", "周二", "周三", "周四", "周五", "周六"];
